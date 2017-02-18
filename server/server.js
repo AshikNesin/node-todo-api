@@ -7,7 +7,13 @@ const {Todo} = require('./models/todo')
 const {User} = require('./models/user')
 
 app.use(bodyParser.json())
-
+app.get('/todos',(req,res)=>{
+	Todo.find().then((todos)=>{
+		res.send({todos})
+	},(err)=>{
+		res.send(400).send(err)
+	})
+})
 app.post('/todos',(req,res)=>{
 	const todo = new Todo({
 		text:req.body.text
