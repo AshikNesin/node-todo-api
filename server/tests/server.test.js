@@ -122,3 +122,34 @@ describe('DELETE /todos/:id', (done) => {
             .end(done)
     })
 })
+
+describe('PATCH /todos/:id', () => {
+    it('should return updated docs and status 200', (done) => {
+    	const updatedText = 'First Todo is an updated todo'
+        request(app)
+            .patch(`/todos/${todos[0]._id.toHexString()}`)
+            .send({text:updatedText,completed:true})
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(updatedText)
+               	expect(res.body.todo.completed).toBe(true)
+               	expect(res.body.todo.completedAt).toBeA('number')
+            })
+            .end(done)
+    });
+
+    it('should return 404 if doc not found', (done) => {
+        const hexId = ObjectId().toHexString();
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .expect(404)
+            .end(done)
+    })
+
+    it('should return 404 for non-object Id', (done) => {
+        request(app)
+            .patch(`/todos/1234`)
+            .expect(404)
+            .end(done)
+    })
+});
