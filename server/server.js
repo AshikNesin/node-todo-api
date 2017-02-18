@@ -21,3 +21,5 @@ app.post('/todos',(req,res)=>{
 app.listen(3000,()=>{
 	console.log('Todo API running on PORT 3000');
 })
+
+module.exports = {app};
