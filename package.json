@@ -1,0 +1,16 @@
+{
+  "name": "node-mongodb",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ashik Nesin <mail@ashiknesin.com>",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^2.2.23"
+  },
+  "devDependencies": {},
+  "description": ""
+}
