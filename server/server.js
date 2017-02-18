@@ -6,8 +6,11 @@ const {ObjectId} = require('mongodb')
 const {mongoose} = require('./db/mongoose')
 const {Todo} = require('./models/todo')
 const {User} = require('./models/user')
-
+const PORT = process.env.PORT || 3000
 app.use(bodyParser.json())
+app.get('/',(req,res)=>{
+	res.send({msg:"It works!"})
+})
 app.get('/todos',(req,res)=>{
 	Todo.find().then((todos)=>{
 		res.send({todos})
@@ -41,8 +44,8 @@ app.get('/todos/:id',(req,res)=>{
 		res.status(400).send()
 	})
 })
-app.listen(3000,()=>{
-	console.log('Todo API running on PORT 3000');
+app.listen(PORT,()=>{
+	console.log(`Todo API running on PORT ${PORT}`);
 })
 
 module.exports = {app};
