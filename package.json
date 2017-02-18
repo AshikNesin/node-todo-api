@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "server/server",
   "scripts": {
-    "start": "node ./server/server",
-    "now-start":"node ./server/server"
+    "test": "mocha server/**/*.test.js",
+    "test-watch": "nodemon --exec 'npm test'",
+    "start": "node server/server"
   },
   "keywords": [],
   "engines": {

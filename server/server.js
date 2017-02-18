@@ -44,6 +44,21 @@ app.get('/todos/:id',(req,res)=>{
 		res.status(400).send()
 	})
 })
+app.delete('/todos/:id',(req,res)=>{
+	const id = req.params.id
+	if(!ObjectId.isValid(id)){
+		return res.status(404).send({error:'Invalid Id'})
+	}
+	Todo.findByIdAndRemove(id).then((item)=>{
+		if(!item){
+			return res.status(404).send({error:'Item not found'})
+		}
+		res.send({todo:item})
+	})
+	.catch((err)=>{
+		res.status(400).send()
+	})
+})
 app.listen(PORT,()=>{
 	console.log(`Todo API running on PORT ${PORT}`);
 })
