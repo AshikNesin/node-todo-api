@@ -9,7 +9,10 @@
   "author": "Ashik Nesin <mail@ashiknesin.com>",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^2.2.23"
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
+    "mongodb": "^2.2.23",
+    "mongoose": "^4.8.3"
   },
   "devDependencies": {},
   "description": ""
