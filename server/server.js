@@ -35,7 +35,7 @@ app.get('/todos/:id',(req,res)=>{
 		if(!item){
 			return res.status(404).send({error:'Item not found'})
 		}
-		res.send(item)
+		res.send({todo:item})
 	})
 	.catch((err)=>{
 		res.status(400).send()
