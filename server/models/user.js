@@ -31,6 +31,13 @@ const UserSchema = new mongoose.Schema({
     }]
 })
 
+UserSchema.methods.toJSON = function(){
+	const user = this;
+	var userObject = user.toObject()
+	return _.pick(userObject,['_id','email'])
+}
+
+
 UserSchema.methods.generateAuthToken = function(){
 	// Arrow fn do not bind this keyword that's why we are using regular function
 	const user = this;
@@ -46,10 +53,22 @@ UserSchema.methods.generateAuthToken = function(){
 	})
 }
 
-UserSchema.methods.toJSON = function(){
-	const user = this;
-	var userObject = user.toObject()
-	return _.pick(userObject,['_id','email'])
+UserSchema.statics.findByToken = function(token){
+	const User = this; // User Model
+	let decoded;
+	try{
+		decoded=jwt.verify(token,'qwerty')
+	} catch(e){
+		// return new Promise((resolve,reject)=>{
+		// 	reject(e)
+		// })
+		return Promise.reject()
+	}
+	return User.findOne({
+		_id:decoded._id,
+		'tokens.access':token,
+		'tokens.access':'auth',
+	})
 }
 
 const User = mongoose.model('User', UserSchema)
