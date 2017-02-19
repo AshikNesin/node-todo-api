@@ -3,19 +3,6 @@ const { Todo } = require('./../../models/todo')
 const { User } = require('./../../models/user')
 const jwt = require('jsonwebtoken')
 
-const todos = [{
-    _id: ObjectId(),
-    text: 'First todo item'
-}, {
-    _id: ObjectId(),
-    text: 'Seconde todo item'
-}]
-
-const populateTodos = (done) => {
-    Todo.remove({}).then(() => {
-        return Todo.insertMany(todos)
-    }).then(() => done())
-}
 
 const userOneId = new ObjectId()
 const userTwoId = new ObjectId()
@@ -31,7 +18,11 @@ const users = [{
 }, {
     _id: userTwoId,
     email: "usertwo@example.com",
-    password: "password2"
+    password: "password2",
+    tokens: [{
+        access: 'auth',
+        token: jwt.sign({ _id: userTwoId, access: 'auth' }, 'qwerty').toString()
+    }]
 }, ]
 
 const populateUsers = (done) => {
@@ -44,6 +35,23 @@ const populateUsers = (done) => {
     }).then(() => done())
 }
 
+
+const todos = [{
+    _id: ObjectId(),
+    text: 'First todo item',
+    _creator:userOneId
+}, {
+    _id: ObjectId(),
+    text: 'Seconde todo item',
+    _creator:userTwoId
+
+}]
+
+const populateTodos = (done) => {
+    Todo.remove({}).then(() => {
+        return Todo.insertMany(todos)
+    }).then(() => done())
+}
 module.exports = {
     todos,
     populateTodos,
