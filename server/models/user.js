@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
+const bcrypt = require('bcryptjs')
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -31,44 +32,60 @@ const UserSchema = new mongoose.Schema({
     }]
 })
 
-UserSchema.methods.toJSON = function(){
-	const user = this;
-	var userObject = user.toObject()
-	return _.pick(userObject,['_id','email'])
+UserSchema.pre('save', function(next) {
+    var user = this;
+    if (user.isModified('password')) {
+        // We don't want to hash the hash 🔥
+        bcrypt.genSalt(10,(err,salt)=>{
+			bcrypt.hash(user.password,salt,(err,hash)=>{
+				user.password = hash
+				next();
+			})
+        })
+    }
+    else{
+    	next();
+    }
+});
+
+UserSchema.methods.toJSON = function() {
+    const user = this;
+    var userObject = user.toObject()
+    return _.pick(userObject, ['_id', 'email'])
 }
 
 
-UserSchema.methods.generateAuthToken = function(){
-	// Arrow fn do not bind this keyword that's why we are using regular function
-	const user = this;
-	const access = 'auth';
-	const token = jwt.sign({_id:user._id.toHexString(),access},'qwerty').toString()
-	user.tokens.push({
-		access,
-		token
-	})
+UserSchema.methods.generateAuthToken = function() {
+    // Arrow fn do not bind this keyword that's why we are using regular function
+    const user = this;
+    const access = 'auth';
+    const token = jwt.sign({ _id: user._id.toHexString(), access }, 'qwerty').toString()
+    user.tokens.push({
+        access,
+        token
+    })
 
-	return user.save().then(()=>{
-		return token
-	})
+    return user.save().then(() => {
+        return token
+    })
 }
 
-UserSchema.statics.findByToken = function(token){
-	const User = this; // User Model
-	let decoded;
-	try{
-		decoded=jwt.verify(token,'qwerty')
-	} catch(e){
-		// return new Promise((resolve,reject)=>{
-		// 	reject(e)
-		// })
-		return Promise.reject()
-	}
-	return User.findOne({
-		_id:decoded._id,
-		'tokens.access':token,
-		'tokens.access':'auth',
-	})
+UserSchema.statics.findByToken = function(token) {
+    const User = this; // User Model
+    let decoded;
+    try {
+        decoded = jwt.verify(token, 'qwerty')
+    } catch (e) {
+        // return new Promise((resolve,reject)=>{
+        // 	reject(e)
+        // })
+        return Promise.reject()
+    }
+    return User.findOne({
+        _id: decoded._id,
+        'tokens.access': token,
+        'tokens.access': 'auth',
+    })
 }
 
 const User = mongoose.model('User', UserSchema)
