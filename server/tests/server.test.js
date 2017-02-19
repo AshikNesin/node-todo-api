@@ -222,30 +222,30 @@ describe('POST /users', () => {
     })
 })
 
-describe('POST /users/login', ()=>{
-    it('should login user and return token', (done)=>{
-        const {email,password} = users[1]
+describe('POST /users/login', () => {
+    it('should login user and return token', (done) => {
+        const { email, password } = users[1]
         request(app)
             .post('/users/login')
-            .send({email,password})
+            .send({ email, password })
             .expect(200)
-            .expect((res)=>{
+            .expect((res) => {
                 expect(res.headers['x-auth']).toExist()
             })
-            .end((err,res)=>{
-                if(err){
+            .end((err, res) => {
+                if (err) {
                     return done(err)
                 }
-                User.findById(users[1]._id).then((user)=>{
+                User.findById(users[1]._id).then((user) => {
                     expect(user.tokens[0]).toInclude({
-                        access:'auth',
-                        token:res.headers['x-auth']
+                        access: 'auth',
+                        token: res.headers['x-auth']
                     })
                     done();
-                }).catch((e)=>done(e))
+                }).catch((e) => done(e))
             })
     })
-    it('should return 400 for invalid credentails', (done)=>{
+    it('should return 400 for invalid credentails', (done) => {
         const payload = {
             email: 'userone@example.com',
             password: 'password1235'
@@ -254,19 +254,45 @@ describe('POST /users/login', ()=>{
             .post('/users/login')
             .send(payload)
             .expect(400)
-            .expect((res)=>{
+            .expect((res) => {
                 expect(res.headers['x-auth']).toNotExist()
             })
-            .end((err,res)=>{
-                if(err){
+            .end((err, res) => {
+                if (err) {
                     return done(err)
                 }
-                User.findById(users[1]._id).then((user)=>{
+                User.findById(users[1]._id).then((user) => {
                     expect(user.tokens.length).toBe(0)
                     done();
-                }).catch((e)=>done(e))
+                }).catch((e) => done(e))
             })
 
     })
 
+})
+
+describe('DELETE /users/me/token', () => {
+    it('should delete token in db and return 200', (done) => {
+        request(app)
+            .delete('/users/me/token')
+            .expect(200)
+            .set('x-auth', users[0].tokens[0].token)
+            .end((err, res) => {
+                if (err) {
+                    return done(err)
+                }
+                User.findById(users[0]._id).then((user) => {
+                    expect(user.tokens.length).toBe(0)
+                    done();
+                }).catch((e) => done(e))
+            })
+    })
+
+    it('should return 401 if Unauthorized', (done) => {
+        request(app)
+            .delete('/users/me/token')
+            .expect(200)
+            .set('x-auth', users[0].tokens[0].token)
+            .end(done)
+    })
 })
