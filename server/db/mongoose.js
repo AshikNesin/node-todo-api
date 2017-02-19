@@ -5,6 +5,5 @@ const MONGODB_URI = {
 	test:'mongodb://localhost:27017/node-todo-test',
 	production:process.env.MONGODB_URI
 }
-mongoose.connect(MONGODB_URI[process.env.NODE_ENV])
-console.log(MONGODB_URI[process.env.NODE_ENV]);
+mongoose.connect(MONGODB_URI[process.env.NODE_ENV || 'dev'])
 module.exports = {mongoose}
